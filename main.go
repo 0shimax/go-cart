@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/sh70k/go-cart/data_loader"
-	"github.com/sh70k/go-cart/splitter"
+	"github.com/0shima_x/go-cart/data_loader"
+	"github.com/0shima_x/go-cart/splitter"
 )
 
 func main() {

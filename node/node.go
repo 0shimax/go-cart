@@ -1,7 +1,7 @@
 package node
 
 import (
-	"github.com/sh70k/go-cart/splitter"
+	"github.com/0shima_x/go-cart/splitter"
 )
 
 // type ObjectType string

@@ -47,15 +47,3 @@ func getPredicte(value interface{}) Predicate {
 	}
 	return predicate
 }
-
-func uniqueCounts(targets []string) map[string]int {
-	var results map[string]int
-	for _, target := range targets {
-		if _, ok := results[target]; ok {
-			results[target] += 1
-		} else {
-			results[target] = 1
-		}
-	}
-	return results
-}
