@@ -10,23 +10,6 @@ import (
 	"github.com/0shima_x/go-cart/splitter"
 )
 
-type Link int
-
-const (
-	LEAF Link = iota
-	BRANCH
-)
-
-func (l Link) String() string {
-	switch l {
-	case LEAF:
-		return "Leaf"
-	case BRANCH:
-		return "Branch"
-	}
-	panic("encounted a unkonwn node type.")
-}
-
 type DecisionTreeClassifier struct {
 	Criterion       string
 	MaxDepth        int
@@ -34,7 +17,6 @@ type DecisionTreeClassifier struct {
 	NClasses        int
 	NFeatures       int
 	NFeature        int
-	Root            Link
 }
 
 func (tree *DecisionTreeClassifier) Build(features [][]interface{}, labels []interface{}) node.Node {
@@ -55,44 +37,52 @@ func (tree *DecisionTreeClassifier) Build(features [][]interface{}, labels []int
 
 	var bestGain float64
 	bestCriteria := make(map[int]interface{})
-	var bestFeatureSets [][][]interface{}
-	var bestLabelSets [][]interface{}
+	var LeftbestFeatureSets [][]interface{}
+	var LeftbestLabelSets []interface{}
+	var RightbestFeatureSets [][]interface{}
+	var RightbestLabelSets []interface{}
 
-	for col := 0; col < tree.NFeature; col++ {
+	for split_col := 0; split_col < tree.NFeature; split_col++ {
 		columnValues := make(map[interface{}]int)
 		for _, feature := range features {
-			columnValues[feature[col]] = 1
+			columnValues[feature[split_col]] = 1
 		}
-		for val := range columnValues {
-			setX1, setX2, setY1, setY2 := splitter.Split(features, labels, col, val)
+		for split_val := range columnValues {
+			setX1, setX2, setY1, setY2 := splitter.Split(features, labels, split_col, split_val)
 			p := float64(len(setX1)) / float64(tree.NFeatures)
 			gain := currentScore - p*metric(setY1) - (1-p)*metric(setY2)
 			if gain > bestGain && len(setY1) > 0 && len(setY2) > 0 {
 				bestGain = gain
+				bestCriteria = map[int]interface{}{split_col: split_val}
 
-				tmpCriteria := map[int]interface{}{col: val}
-				bestCriteria = tmpCriteria
+				LeftbestFeatureSets = setX1
+				RightbestFeatureSets = setX2
 
-				var tmpSets [][][]interface{}
-				tmpSets = append(tmpSets, setX1)
-				tmpSets = append(tmpSets, setX2)
-				bestFeatureSets = tmpSets
-
-				var tmpLSets [][]interface{}
-				tmpLSets = append(tmpLSets, setY1)
-				tmpLSets = append(tmpLSets, setY2)
-				bestLabelSets = tmpLSets
+				LeftbestLabelSets = setY1
+				RightbestLabelSets = setY2
 			}
 		}
-
-		if bestGain > 0 {
-			leftBranch := tree.Build(bestFeatureSets[0], bestLabelSets[0])
-			rightBranch := tree.Build(bestFeatureSets[1], bestLabelSets[1])
-			criteriaCol := reflect.ValueOf(bestCriteria).MapKeys()[0].Interface().(int)
-			return node.Node{Col: criteriaCol, Value: bestCriteria[criteriaCol], Left: leftBranch, Right: rightBranch}
-		} else {
-			return node.Node{Results: criterion.UniqueCounts(labels)}
-		}
 	}
-	return node.Node{}
+
+	if bestGain > 0 {
+		leftBranch := tree.Build(LeftbestFeatureSets, LeftbestLabelSets)
+		rightBranch := tree.Build(RightbestFeatureSets, RightbestLabelSets)
+		splitCol := reflect.ValueOf(bestCriteria).MapKeys()[0].Interface().(int)
+		return node.Node{SplitCol: splitCol, SplitValue: bestCriteria[splitCol], Left: leftBranch, Right: rightBranch, NodeType: node.BRANCH}
+	} else {
+		return node.Node{Results: criterion.UniqueCounts(labels), NodeType: node.LEAF}
+	}
+}
+
+func (tree *DecisionTreeClassifier) Print(trainedModel node.Node, indent string) {
+	if trainedModel.NodeType == node.LEAF {
+		fmt.Println(trainedModel.Results)
+	} else {
+		fmt.Println(fmt.Sprint(trainedModel.SplitCol) + ":" + fmt.Sprint(trainedModel.SplitValue) + "?")
+
+		fmt.Print(indent + "T-> ")
+		tree.Print(trainedModel.Left.(node.Node), indent+"  ")
+		fmt.Print(indent + "F-> ")
+		tree.Print(trainedModel.Right.(node.Node), indent+"  ")
+	}
 }

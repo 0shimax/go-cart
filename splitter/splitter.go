@@ -31,13 +31,13 @@ func Split(features [][]interface{}, labels []interface{}, col int, value interf
 	var setMatchLbels []interface{}
 	var setUnMatchLbels []interface{}
 
-	for _, item := range features {
+	for i, item := range features {
 		if predicate(item[col], value) {
 			setMatchFeatures = append(setMatchFeatures, item)
-			setMatchLbels = append(setMatchLbels, item)
+			setMatchLbels = append(setMatchLbels, labels[i])
 		} else {
 			setUnMatchFeatures = append(setUnMatchFeatures, item)
-			setUnMatchLbels = append(setUnMatchLbels, item)
+			setUnMatchLbels = append(setUnMatchLbels, labels[i])
 		}
 	}
 	return setMatchFeatures, setUnMatchFeatures, setMatchLbels, setUnMatchLbels

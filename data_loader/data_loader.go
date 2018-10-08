@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strconv"
 )
 
 func Load(path string) [][]interface{} {
@@ -22,7 +23,12 @@ func Load(path string) [][]interface{} {
 		}
 		intrfcLine := make([]interface{}, len(line))
 		for i, v := range line {
-			intrfcLine[i] = v
+			if fv, err := strconv.ParseFloat(v, 64); err == nil {
+				intrfcLine[i] = fv
+			} else {
+				intrfcLine[i] = v
+			}
+
 		}
 		datas = append(datas, intrfcLine)
 	}

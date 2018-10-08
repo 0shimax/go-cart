@@ -1,7 +1,6 @@
 package criterion
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -30,9 +29,6 @@ func xlog2(x float64) float64 {
 func UniqueCounts(targets []interface{}) map[string]int {
 	results := make(map[string]int)
 	for _, target := range targets {
-
-		fmt.Println("target:", target)
-		fmt.Println("target(string):", target.(string))
 		if _, ok := results[target.(string)]; ok {
 			results[target.(string)]++
 		} else {
