@@ -1,26 +1,52 @@
 package criterion
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
+
+// type Metric int
+//
+// const (
+// 	GINI Metric = iota
+// 	ENTROPY
+// )
+//
+// func (m Metric) String() string {
+// 	switch m {
+// 	case GINI:
+// 		return "Gini"
+// 	case ENTROPY:
+// 		return "Entropy"
+// 	default:
+// 		return "Gini"
+// 	}
+// }
 
 func xlog2(x float64) float64 {
 	return math.Log(x) / math.Log(2)
 }
 
-func uniqueCounts(targets []string) map[string]int {
-	var results map[string]int
+func UniqueCounts(targets []interface{}) map[string]int {
+	results := make(map[string]int)
 	for _, target := range targets {
-		if _, ok := results[target]; ok {
-			results[target]++
+
+		fmt.Println("target:", target)
+		fmt.Println("target(string):", target.(string))
+		if _, ok := results[target.(string)]; ok {
+			results[target.(string)]++
 		} else {
-			results[target] = 1
+			results[target.(string)] = 1
 		}
 	}
 	return results
 }
 
-func GiniImpurity(targets []string) float64 {
+type Metric func([]interface{}) float64
+
+func GiniImpurity(targets []interface{}) float64 {
 	nData := float64(len(targets))
-	counts := uniqueCounts(targets)
+	counts := UniqueCounts(targets)
 	imp := 0.
 	for k1 := range counts {
 		c1 := float64(counts[k1]) / nData
@@ -35,9 +61,9 @@ func GiniImpurity(targets []string) float64 {
 	return imp
 }
 
-func Entropy(targets []string) float64 {
+func Entropy(targets []interface{}) float64 {
 	nData := float64(len(targets))
-	counts := uniqueCounts(targets)
+	counts := UniqueCounts(targets)
 	ent := 0.
 	for k := range counts {
 		p := float64(counts[k]) / nData

@@ -4,16 +4,13 @@ import (
 	"github.com/0shima_x/go-cart/splitter"
 )
 
-// type ObjectType string
-
 type Node struct {
-	// Match         TrainingSet
-	// NoMatch       TrainingSet
-	// Gain          float64
+	Left      interface{}
+	Right     interface{}
 	Col       int
 	Predicate splitter.Predicate
-	// PredicateName string
-	Value interface{}
+	Value     interface{}
+	Results   map[string]int
 }
 
 // const (

@@ -22,20 +22,25 @@ func predicateGte(a, b interface{}) bool {
 	return false
 }
 
-func Split(rows [][]interface{}, col int, value interface{}) ([][]interface{}, [][]interface{}) {
+func Split(features [][]interface{}, labels []interface{}, col int, value interface{}) ([][]interface{}, [][]interface{}, []interface{}, []interface{}) {
 	// var res Node
 	predicate := getPredicte(value)
-	var setMatch [][]interface{}
-	var setUnMatch [][]interface{}
+	var setMatchFeatures [][]interface{}
+	var setUnMatchFeatures [][]interface{}
 
-	for _, item := range rows {
+	var setMatchLbels []interface{}
+	var setUnMatchLbels []interface{}
+
+	for _, item := range features {
 		if predicate(item[col], value) {
-			setMatch = append(setMatch, item)
+			setMatchFeatures = append(setMatchFeatures, item)
+			setMatchLbels = append(setMatchLbels, item)
 		} else {
-			setUnMatch = append(setUnMatch, item)
+			setUnMatchFeatures = append(setUnMatchFeatures, item)
+			setUnMatchLbels = append(setUnMatchLbels, item)
 		}
 	}
-	return setMatch, setUnMatch
+	return setMatchFeatures, setUnMatchFeatures, setMatchLbels, setUnMatchLbels
 }
 
 func getPredicte(value interface{}) Predicate {
