@@ -78,7 +78,7 @@ func (tree *DecisionTreeClassifier) Print(trainedModel node.Node, indent string)
 	if trainedModel.String() == node.LEAF {
 		fmt.Println(trainedModel.Print())
 	} else {
-		fmt.Println(trainedModel.Print() + "?")
+		fmt.Println(trainedModel.Print())
 
 		fmt.Print(indent + "T-> ")
 		tree.Print(trainedModel.GetLeft(), indent+"  ")
