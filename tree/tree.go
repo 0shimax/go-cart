@@ -68,21 +68,21 @@ func (tree *DecisionTreeClassifier) Build(features [][]interface{}, labels []int
 		leftBranch := tree.Build(LeftbestFeatureSets, LeftbestLabelSets)
 		rightBranch := tree.Build(RightbestFeatureSets, RightbestLabelSets)
 		splitCol := reflect.ValueOf(bestCriteria).MapKeys()[0].Interface().(int)
-		return node.Node{SplitCol: splitCol, SplitValue: bestCriteria[splitCol], Left: leftBranch, Right: rightBranch, NodeType: node.BRANCH}
+		return node.Branch{SplitCol: splitCol, SplitValue: bestCriteria[splitCol], Left: leftBranch, Right: rightBranch}
 	} else {
-		return node.Node{Results: criterion.UniqueCounts(labels), NodeType: node.LEAF}
+		return node.Leaf{Results: criterion.UniqueCounts(labels)}
 	}
 }
 
 func (tree *DecisionTreeClassifier) Print(trainedModel node.Node, indent string) {
-	if trainedModel.NodeType == node.LEAF {
-		fmt.Println(trainedModel.Results)
+	if trainedModel.String() == node.LEAF {
+		fmt.Println(trainedModel.Print())
 	} else {
-		fmt.Println(fmt.Sprint(trainedModel.SplitCol) + ":" + fmt.Sprint(trainedModel.SplitValue) + "?")
+		fmt.Println(trainedModel.Print() + "?")
 
 		fmt.Print(indent + "T-> ")
-		tree.Print(trainedModel.Left.(node.Node), indent+"  ")
+		tree.Print(trainedModel.GetLeft(), indent+"  ")
 		fmt.Print(indent + "F-> ")
-		tree.Print(trainedModel.Right.(node.Node), indent+"  ")
+		tree.Print(trainedModel.GetRight(), indent+"  ")
 	}
 }
